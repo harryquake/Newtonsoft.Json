@@ -52,10 +52,10 @@ namespace Newtonsoft.Json.Linq
     ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParse" title="Parsing a JSON Object from Text" />
     /// </example>
     public class JObject : JContainer, IDictionary<string, JToken>, INotifyPropertyChanged
-#if !(NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(DOTNET || PORTABLE40 || PORTABLE)
         , ICustomTypeDescriptor
 #endif
-#if !(NET20 || NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(NET20 || PORTABLE40 || PORTABLE)
         , INotifyPropertyChanging
 #endif
     {
@@ -75,7 +75,7 @@ namespace Newtonsoft.Json.Linq
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-#if !(NET20 || NETFX_CORE || PORTABLE || PORTABLE40)
+#if !(NET20 || PORTABLE || PORTABLE40)
         /// <summary>
         /// Occurs when a property value is changing.
         /// </summary>
@@ -192,7 +192,7 @@ namespace Newtonsoft.Json.Linq
         internal void InternalPropertyChanged(JProperty childProperty)
         {
             OnPropertyChanged(childProperty.Name);
-#if !(NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(DOTNET || PORTABLE40 || PORTABLE)
             if (_listChanged != null)
                 OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOfItem(childProperty)));
 #endif
@@ -204,7 +204,7 @@ namespace Newtonsoft.Json.Linq
 
         internal void InternalPropertyChanging(JProperty childProperty)
         {
-#if !(NET20 || NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(NET20 || PORTABLE40 || PORTABLE)
             OnPropertyChanging(childProperty.Name);
 #endif
         }
@@ -307,7 +307,7 @@ namespace Newtonsoft.Json.Linq
                 }
                 else
                 {
-#if !(NET20 || NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(NET20 || PORTABLE40 || PORTABLE)
                     OnPropertyChanging(propertyName);
 #endif
                     Add(new JProperty(propertyName, value));
@@ -322,6 +322,18 @@ namespace Newtonsoft.Json.Linq
         /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JObject"/>.</param>
         /// <returns>A <see cref="JObject"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
         public new static JObject Load(JsonReader reader)
+        {
+            return Load(reader, null);
+        }
+
+        /// <summary>
+        /// Loads an <see cref="JObject"/> from a <see cref="JsonReader"/>. 
+        /// </summary>
+        /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JObject"/>.</param>
+        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
+        /// If this is null, default load settings will be used.</param>
+        /// <returns>A <see cref="JObject"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
+        public new static JObject Load(JsonReader reader, JsonLoadSettings settings)
         {
             ValidationUtils.ArgumentNotNull(reader, "reader");
 
@@ -344,7 +356,7 @@ namespace Newtonsoft.Json.Linq
             JObject o = new JObject();
             o.SetLineInfo(reader as IJsonLineInfo);
 
-            o.ReadTokenFrom(reader);
+            o.ReadTokenFrom(reader, settings);
 
             return o;
         }
@@ -359,9 +371,24 @@ namespace Newtonsoft.Json.Linq
         /// </example>
         public new static JObject Parse(string json)
         {
+            return Parse(json, null);
+        }
+
+        /// <summary>
+        /// Load a <see cref="JObject"/> from a string that contains JSON.
+        /// </summary>
+        /// <param name="json">A <see cref="String"/> that contains JSON.</param>
+        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
+        /// If this is null, default load settings will be used.</param>
+        /// <returns>A <see cref="JObject"/> populated from the string that contains JSON.</returns>
+        /// <example>
+        ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParse" title="Parsing a JSON Object from Text" />
+        /// </example>
+        public new static JObject Parse(string json, JsonLoadSettings settings)
+        {
             using (JsonReader reader = new JsonTextReader(new StringReader(json)))
             {
-                JObject o = Load(reader);
+                JObject o = Load(reader, settings);
 
                 if (reader.Read() && reader.TokenType != JsonToken.Comment)
                     throw JsonReaderException.Create(reader, "Additional text found in JSON string after parsing content.");
@@ -618,7 +645,7 @@ namespace Newtonsoft.Json.Linq
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-#if !(NETFX_CORE || PORTABLE40 || PORTABLE || NET20)
+#if !(PORTABLE40 || PORTABLE || NET20)
         /// <summary>
         /// Raises the <see cref="PropertyChanging"/> event with the provided arguments.
         /// </summary>
@@ -630,7 +657,7 @@ namespace Newtonsoft.Json.Linq
         }
 #endif
 
-#if !(NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(DOTNET || PORTABLE40 || PORTABLE)
         // include custom type descriptor on JObject rather than use a provider because the properties are specific to a type
 
         #region ICustomTypeDescriptor

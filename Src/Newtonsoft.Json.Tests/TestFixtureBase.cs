@@ -29,7 +29,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-#if NET20
+#if (NET20 || NET35)
 using Newtonsoft.Json.Serialization;
 #else
 using System.Runtime.Serialization.Json;
@@ -144,6 +144,10 @@ namespace Newtonsoft.Json.Tests
             XAssert.True(false, message);
         }
 
+        public static void Pass()
+        {
+        }
+
         public static void IsTrue(bool condition, string message = null)
         {
             XAssert.True(condition);
@@ -192,7 +196,7 @@ namespace Newtonsoft.Json.Tests
     [TestFixture]
     public abstract class TestFixtureBase
     {
-#if !NET20
+#if !(NET20 || NET35)
         protected string GetDataContractJsonSerializeResult(object o)
         {
             MemoryStream ms = new MemoryStream();
@@ -261,7 +265,7 @@ namespace Newtonsoft.Json.Tests
         protected void TestSetup()
 #endif
         {
-#if !NETFX_CORE
+#if !(NETFX_CORE || DNXCORE50)
             //CultureInfo turkey = CultureInfo.CreateSpecificCulture("tr");
             //Thread.CurrentThread.CurrentCulture = turkey;
             //Thread.CurrentThread.CurrentUICulture = turkey;

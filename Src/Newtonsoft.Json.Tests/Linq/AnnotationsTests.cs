@@ -1,10 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+#if NET20
+using Newtonsoft.Json.Utilities.LinqBridge;
+#else
 using System.Linq;
+#endif
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+#if NETFX_CORE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using TestFixture = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.TestClassAttribute;
+using Test = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.TestMethodAttribute;
+#elif DNXCORE50
+using Xunit;
+using TestAttribute = Xunit.FactAttribute;
+using Assert = Newtonsoft.Json.Tests.XUnitAssert;
+#else
 using NUnit.Framework;
+#endif
 
 namespace Newtonsoft.Json.Tests.Linq
 {
@@ -247,6 +260,7 @@ namespace Newtonsoft.Json.Tests.Linq
             Assert.AreEqual(new Uri("http://www.google.com/"), i);
         }
 
+#if !NET20
         [Test]
         public void Example()
         {
@@ -270,5 +284,6 @@ namespace Newtonsoft.Json.Tests.Linq
 
             Assert.AreEqual(2, changedProperties.Count);
         }
+#endif
     }
 }

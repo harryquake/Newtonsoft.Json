@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Resources;
 using System.Globalization;
 #if NET20
 using Newtonsoft.Json.Utilities.LinqBridge;
@@ -85,7 +84,7 @@ namespace Newtonsoft.Json.Utilities
 
             if (creator != null)
             {
-                d.Creator = delegateFactory.CreateParametrizedConstructor(creator);
+                d.Creator = delegateFactory.CreateParameterizedConstructor(creator);
             }
             else
             {

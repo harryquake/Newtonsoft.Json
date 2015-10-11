@@ -23,7 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-#if !(PORTABLE || NETFX_CORE || PORTABLE40)
+#if !(DOTNET || PORTABLE || PORTABLE40)
 using System;
 using System.Collections.Generic;
 #if NET20
@@ -49,7 +49,7 @@ namespace Newtonsoft.Json.Utilities
             return dynamicMethod;
         }
 
-        public override ObjectConstructor<object> CreateParametrizedConstructor(MethodBase method)
+        public override ObjectConstructor<object> CreateParameterizedConstructor(MethodBase method)
         {
             DynamicMethod dynamicMethod = CreateDynamicMethod(method.ToString(), typeof(object), new[] { typeof(object[]) }, method.DeclaringType);
             ILGenerator generator = dynamicMethod.GetILGenerator();

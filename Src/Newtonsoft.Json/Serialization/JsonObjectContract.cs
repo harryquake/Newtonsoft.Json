@@ -33,7 +33,7 @@ using Newtonsoft.Json.Utilities;
 namespace Newtonsoft.Json.Serialization
 {
     /// <summary>
-    /// Contract details for a <see cref="Type"/> used by the <see cref="JsonSerializer"/>.
+    /// Contract details for a <see cref="System.Type"/> used by the <see cref="JsonSerializer"/>.
     /// </summary>
     public class JsonObjectContract : JsonContainerContract
     {
@@ -69,7 +69,18 @@ namespace Newtonsoft.Json.Serialization
         /// <summary>
         /// Gets a collection of <see cref="JsonProperty"/> instances that define the parameters used with <see cref="OverrideCreator"/>.
         /// </summary>
-        public JsonPropertyCollection CreatorParameters { get; private set; }
+        public JsonPropertyCollection CreatorParameters
+        {
+            get
+            {
+                if (_creatorParameters == null)
+                {
+                    _creatorParameters = new JsonPropertyCollection(UnderlyingType);
+                }
+
+                return _creatorParameters;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the override constructor used to create the object.
@@ -84,7 +95,7 @@ namespace Newtonsoft.Json.Serialization
             set
             {
                 _overrideConstructor = value;
-                _overrideCreator = (value != null) ? JsonTypeReflector.ReflectionDelegateFactory.CreateParametrizedConstructor(value) : null;
+                _overrideCreator = (value != null) ? JsonTypeReflector.ReflectionDelegateFactory.CreateParameterizedConstructor(value) : null;
             }
         }
 
@@ -99,7 +110,7 @@ namespace Newtonsoft.Json.Serialization
             set
             {
                 _parametrizedConstructor = value;
-                _parametrizedCreator = (value != null) ? JsonTypeReflector.ReflectionDelegateFactory.CreateParametrizedConstructor(value) : null;
+                _parameterizedCreator = (value != null) ? JsonTypeReflector.ReflectionDelegateFactory.CreateParameterizedConstructor(value) : null;
             }
         }
 
@@ -118,9 +129,9 @@ namespace Newtonsoft.Json.Serialization
             }
         }
 
-        internal ObjectConstructor<object> ParametrizedCreator
+        internal ObjectConstructor<object> ParameterizedCreator
         {
-            get { return _parametrizedCreator; }
+            get { return _parameterizedCreator; }
         }
 
         /// <summary>
@@ -137,7 +148,8 @@ namespace Newtonsoft.Json.Serialization
         private ConstructorInfo _parametrizedConstructor;
         private ConstructorInfo _overrideConstructor;
         private ObjectConstructor<object> _overrideCreator;
-        private ObjectConstructor<object> _parametrizedCreator;
+        private ObjectConstructor<object> _parameterizedCreator;
+        private JsonPropertyCollection _creatorParameters;
 
         internal bool HasRequiredOrDefaultValueProperties
         {
@@ -178,10 +190,9 @@ namespace Newtonsoft.Json.Serialization
             ContractType = JsonContractType.Object;
 
             Properties = new JsonPropertyCollection(UnderlyingType);
-            CreatorParameters = new JsonPropertyCollection(UnderlyingType);
         }
 
-#if !(NETFX_CORE || PORTABLE40 || PORTABLE)
+#if !(DOTNET || PORTABLE40 || PORTABLE)
 #if !(NET20 || NET35)
         [SecuritySafeCritical]
 #endif
